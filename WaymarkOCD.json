@@ -1,11 +1,11 @@
 ﻿{
   "Author": "Jesus",
   "Name": "WaymarkOCD",
-  "Punchline": "",
+  "Punchline": "Pixel perfect waymark placement",
   "Description": "",
   "Tags": [ "Other" ],
   "InternalName": "WaymarkOCD",
-  "AssemblyVersion": "0.1.0.0",
+  "AssemblyVersion": "1.0.0.0",
   "RepoUrl": "",
   "ApplicableVersion": "any",
   "DalamudApiLevel": 8,

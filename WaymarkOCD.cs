@@ -36,66 +36,13 @@ namespace WaymarkOCDPlugin
             MemoryHandler.Init();
             ZoneInfoHandler.Init();
 
-            commandManager.AddHandler("/alignx", new(OnAlignXCommand));
-            commandManager.AddHandler("/aligny", new(OnAlignYCommand));
+            commandManager.AddHandler("/setwaymark", new(OnSetWaymarkCommand));
+            commandManager.AddHandler("/getwaymark", new(OnGetWaymarkCommand));
+            commandManager.AddHandler("/setwaymarkpolar", new(OnSetWaymarkCommandPolar));
         }
 
-        private unsafe void OnAlignXCommand(string command, string args)
+        private static GamePresetPoint? GetMarker(GamePreset gamePreset, String marker)
         {
-            string[] arguments = args.Split(" ");
-            if (arguments.Length != 2)
-            {
-                chatGui.Print("Usage: /alignx a 1");
-                chatGui.Print("In this example, the A marker will be aligned to the 1 marker along the X axis");
-                return;
-            }
-
-            string markerToBeAligned = arguments[0];
-            string markerToAlignTo = arguments[1];
-
-            GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
-
-            if (preset == null)
-            {
-                chatGui.Print("No waymarks detected");
-                return;
-            }
-
-            var (pointToBeAligned, pointToAlignTo) = GetMarkers(markerToBeAligned, markerToAlignTo);
-            if (pointToBeAligned == null)
-            {
-                chatGui.Print("Invalid waymark name: " + pointToBeAligned);
-                chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
-                return;
-            }
-            if (pointToAlignTo == null)
-            {
-                chatGui.Print("Invalid waymark name: " + markerToBeAligned);
-                chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
-                return;
-            }
-
-            GamePreset realPreset = preset.Value;
-            realPreset.A.X = pointToAlignTo.Value.X;
-
-            MemoryHandler.DirectPlacePreset(realPreset);
-        }
-
-        private static (GamePresetPoint?, GamePresetPoint?) GetMarkers(String marker1, String marker2)
-        {
-            return (GetMarker(marker1), GetMarker(marker2));
-        }
-
-        private static GamePresetPoint? GetMarker(String marker)
-        {
-            GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
-            if (preset == null)
-            {
-                return null;
-            }
-
-            GamePreset gamePreset = preset.Value;
-
             return marker switch
             {
                 "a" or "A" => gamePreset.A,
@@ -110,15 +57,220 @@ namespace WaymarkOCDPlugin
             };
         }
 
-        private unsafe void OnAlignYCommand(string command, string args)
+        private unsafe void OnSetWaymarkCommand(string command, string args)
         {
+            string[] arguments = args.Split(" ");
+            if (arguments.Length != 3)
+            {
+                chatGui.Print("Usage: /setwaymark a xCoordinate yCoordinate");
+                chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
+                return;
+            }
+
+            string marker = arguments[0];
+            string xString = arguments[1];
+            string yString = arguments[2];
+
+            if (!int.TryParse(xString, out int x))
+            {
+                chatGui.Print("x coordinate was not a number: " + xString);
+                return;
+            }
+
+            if (!int.TryParse(yString, out int y))
+            {
+                chatGui.Print("y coordinate was not a number: " + yString);
+                return;
+            }
+
+            GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
+
+            if (preset == null)
+            {
+                chatGui.Print("No waymarks detected");
+                return;
+            }
+
+            GamePreset realPreset = preset.Value;
+
+            switch (marker)
+            {
+                case "a":
+                case "A":
+                    realPreset.A.X = x;
+                    realPreset.A.Z = y;
+                    realPreset.A.Active = true;
+                    break;
+                case "b":
+                case "B":
+                    realPreset.B.X = x;
+                    realPreset.B.Z = y;
+                    realPreset.B.Active = true;
+                    break;
+                case "c":
+                case "C":
+                    realPreset.C.X = x;
+                    realPreset.C.Z = y;
+                    realPreset.C.Active = true;
+                    break;
+                case "d":
+                case "D":
+                    realPreset.D.X = x;
+                    realPreset.D.Z = y;
+                    realPreset.D.Active = true;
+                    break;
+                case "1":
+                    realPreset.One.X = x;
+                    realPreset.One.Z = y;
+                    realPreset.One.Active = true;
+                    break;
+                case "2":
+                    realPreset.Two.X = x;
+                    realPreset.Two.Z = y;
+                    realPreset.Two.Active = true;
+                    break;
+                case "3":
+                    realPreset.Three.X = x;
+                    realPreset.Three.Z = y;
+                    realPreset.Three.Active = true;
+                    break;
+                case "4":
+                    realPreset.Four.X = x;
+                    realPreset.Four.Z = y;
+                    realPreset.Four.Active = true;
+                    break;
+                default:
+                    chatGui.Print("Invalid waymark name: " + marker);
+                    chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
+                    break;
+            }
+
+            MemoryHandler.DirectPlacePreset(realPreset);
+        }
+
+        private unsafe void OnGetWaymarkCommand(string command, string args)
+        {
+            GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
+
+            if (preset == null)
+            {
+                chatGui.Print("No waymarks detected");
+                return;
+            }
+
+            GamePresetPoint? point = GetMarker(preset.Value, args);
+            if (point == null)
+            {
+                chatGui.Print("Invalid waymark name: " + point);
+                chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
+                return;
+            }
+
+            chatGui.Print("Marker " + args + ": " + point.Value);
+        }
+
+        private unsafe void OnSetWaymarkCommandPolar(string command, string args)
+        {
+            string[] arguments = args.Split(" ");
+            if (arguments.Length != 3)
+            {
+                chatGui.Print("Usage: /setwaymark a degrees distance");
+                chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
+                return;
+            }
+
+            string marker = arguments[0];
+            string degreesString = arguments[1];
+            string distanceString = arguments[2];
+
+            if (!int.TryParse(degreesString, out int degrees))
+            {
+                chatGui.Print("degrees value was not a number: " + degrees);
+                return;
+            }
+
+            if (!int.TryParse(distanceString, out int distance))
+            {
+                chatGui.Print("distance was not a number: " + distance);
+                return;
+            }
+
+            var (x, y) = PolarCoordinatesHelper.GetXYCoordinatesFromPolar(distance, degrees);
+
+            GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
+
+            if (preset == null)
+            {
+                chatGui.Print("No waymarks detected");
+                return;
+            }
+
+            GamePreset realPreset = preset.Value;
+
+            switch (marker)
+            {
+                case "a":
+                case "A":
+                    realPreset.A.X = x;
+                    realPreset.A.Z = y;
+                    realPreset.A.Active = true;
+                    break;
+                case "b":
+                case "B":
+                    realPreset.B.X = x;
+                    realPreset.B.Z = y;
+                    realPreset.B.Active = true;
+                    break;
+                case "c":
+                case "C":
+                    realPreset.C.X = x;
+                    realPreset.C.Z = y;
+                    realPreset.C.Active = true;
+                    break;
+                case "d":
+                case "D":
+                    realPreset.D.X = x;
+                    realPreset.D.Z = y;
+                    realPreset.D.Active = true;
+                    break;
+                case "1":
+                    realPreset.One.X = x;
+                    realPreset.One.Z = y;
+                    realPreset.One.Active = true;
+                    break;
+                case "2":
+                    realPreset.Two.X = x;
+                    realPreset.Two.Z = y;
+                    realPreset.Two.Active = true;
+                    break;
+                case "3":
+                    realPreset.Three.X = x;
+                    realPreset.Three.Z = y;
+                    realPreset.Three.Active = true;
+                    break;
+                case "4":
+                    realPreset.Four.X = x;
+                    realPreset.Four.Z = y;
+                    realPreset.Four.Active = true;
+                    break;
+                default:
+                    chatGui.Print("Invalid waymark name: " + marker);
+                    chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
+                    break;
+            }
+
+            MemoryHandler.DirectPlacePreset(realPreset);
         }
 
         //	Cleanup
         public void Dispose()
         {
-            commandManager.RemoveHandler("/waymark");
+            commandManager.RemoveHandler("/setwaymark");
+            commandManager.RemoveHandler("/setwaymarkpolar");
+            commandManager.RemoveHandler("/getwaymark");
             MemoryHandler.Uninit();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

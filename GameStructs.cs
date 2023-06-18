@@ -116,7 +116,8 @@ namespace WaymarkOCDPlugin
             {
                 return "Not active";
             }
-            return $"{X}, {Z}";
+            var (distance, angle) = PolarCoordinatesHelper.GetPolarCoordinatesFromXY(X, Z);
+            return $"{X}, {Z}     (Polar: {distance:N2}, {angle:N2})";
         }
     }
 
