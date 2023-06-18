@@ -147,7 +147,7 @@ namespace WaymarkOCDPlugin
             return preset;
         }
 
-        public string GetPresetDataString(GetZoneNameDelegate dGetZoneName = null, bool showIDToo = false)
+        public string GetPresetDataString(GetZoneNameDelegate dGetZoneName, bool showIDToo = false)
         {
             //	Try to get the zone name from the function passed to us if we can.
             string zoneName = "";
@@ -198,9 +198,7 @@ namespace WaymarkOCDPlugin
             }
             set
             {
-                bool fireEvent = value != mMapID;
                 mMapID = value;
-                if (fireEvent) MapIDChangedEvent?.Invoke(this, mMapID);
             }
         }
 
@@ -230,7 +228,7 @@ namespace WaymarkOCDPlugin
             };
         }
 
-        public string GetNameForWaymarkIndex(int i, bool getLongName = false)
+        public static string GetNameForWaymarkIndex(int i, bool getLongName = false)
         {
             return i switch
             {
@@ -245,8 +243,6 @@ namespace WaymarkOCDPlugin
                 _ => throw new ArgumentOutOfRangeException($"Error in WaymarkPreset.GetNameForWaymarkIndex(): Invalid index \"{i}\""),
             };
         }
-
-        public event Action<WaymarkPreset, UInt16> MapIDChangedEvent;
 
         public virtual bool ShouldSerializeTime()   //More JSON bullshit because it has to be polymorphic for the serializer to check it in a derived class apparently.
         {
@@ -263,7 +259,13 @@ namespace WaymarkOCDPlugin
         }
         public override UInt16 ReadJson(JsonReader reader, Type objectType, UInt16 existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            long val = (long)reader.Value;
+            object? value = reader.Value;
+            if (value == null)
+            {
+                return 0;
+            }
+
+            long val = (long)value;
             if (val > UInt16.MaxValue || val < 0)
             {
                 return 0;
