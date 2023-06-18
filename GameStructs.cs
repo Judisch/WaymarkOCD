@@ -25,7 +25,7 @@ namespace WaymarkOCDPlugin
         [MarshalAs(UnmanagedType.Bool)]
         [FieldOffset(0x1C)] public bool Active;
 
-        public GameWaymark(GamePresetPoint presetPoint, bool active, bool ignoreInts = false)
+        public GameWaymark(GamePresetPoint presetPoint, bool ignoreInts = false)
         {
             X_Float = (float)presetPoint.X / 1000.0f;
             Y_Float = (float)presetPoint.Y / 1000.0f;
@@ -35,7 +35,7 @@ namespace WaymarkOCDPlugin
             Y_Int = ignoreInts ? 0 : presetPoint.Y;
             Z_Int = ignoreInts ? 0 : presetPoint.Z;
 
-            Active = active;
+            Active = presetPoint.Active;
         }
 
         public override string ToString()
@@ -60,14 +60,14 @@ namespace WaymarkOCDPlugin
 
         public GameWaymarks(GamePreset preset)
         {
-            A = new GameWaymark(preset.A, preset.ActiveMarkers[0]);
-            B = new GameWaymark(preset.B, preset.ActiveMarkers[1]);
-            C = new GameWaymark(preset.C, preset.ActiveMarkers[2]);
-            D = new GameWaymark(preset.D, preset.ActiveMarkers[3]);
-            One = new GameWaymark(preset.One, preset.ActiveMarkers[4]);
-            Two = new GameWaymark(preset.Two, preset.ActiveMarkers[5]);
-            Three = new GameWaymark(preset.Three, preset.ActiveMarkers[6]);
-            Four = new GameWaymark(preset.Four, preset.ActiveMarkers[7]);
+            A = new GameWaymark(preset.A);
+            B = new GameWaymark(preset.B);
+            C = new GameWaymark(preset.C);
+            D = new GameWaymark(preset.D);
+            One = new GameWaymark(preset.One);
+            Two = new GameWaymark(preset.Two);
+            Three = new GameWaymark(preset.Three);
+            Four = new GameWaymark(preset.Four);
         }
 
         public override string ToString()
@@ -90,6 +90,7 @@ namespace WaymarkOCDPlugin
         public int X;
         public int Y;
         public int Z;
+        public bool Active;
 
         public GamePresetPoint(GameWaymark waymark, bool useClientVals = true)
         {
@@ -98,18 +99,24 @@ namespace WaymarkOCDPlugin
                 X = (int)(waymark.X_Float * 1000.0f);
                 Y = (int)(waymark.Y_Float * 1000.0f);
                 Z = (int)(waymark.Z_Float * 1000.0f);
+                Active = waymark.Active;
             }
             else
             {
                 X = waymark.X_Int;
                 Y = waymark.Y_Int;
                 Z = waymark.Z_Int;
+                Active = waymark.Active;
             }
         }
 
         public override string ToString()
         {
-            return $"{X}, {Y}, {Z}";
+            if (!Active)
+            {
+                return "Not active";
+            }
+            return $"{X}, {Z}";
         }
     }
 
@@ -125,7 +132,6 @@ namespace WaymarkOCDPlugin
         public GamePresetPoint Two;
         public GamePresetPoint Three;
         public GamePresetPoint Four;
-        public BitField8 ActiveMarkers;
         private readonly byte _reserved;
         public UInt16 ContentFinderConditionID;
         public Int32 UnixTime;
@@ -141,16 +147,6 @@ namespace WaymarkOCDPlugin
             Three = new GamePresetPoint(waymarks.Three);
             Four = new GamePresetPoint(waymarks.Four);
 
-            ActiveMarkers = new BitField8();
-            ActiveMarkers[0] = waymarks.A.Active;
-            ActiveMarkers[1] = waymarks.B.Active;
-            ActiveMarkers[2] = waymarks.C.Active;
-            ActiveMarkers[3] = waymarks.D.Active;
-            ActiveMarkers[4] = waymarks.One.Active;
-            ActiveMarkers[5] = waymarks.Two.Active;
-            ActiveMarkers[6] = waymarks.Three.Active;
-            ActiveMarkers[7] = waymarks.Four.Active;
-
             _reserved = 0;
             ContentFinderConditionID = 0;
             UnixTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -165,48 +161,46 @@ namespace WaymarkOCDPlugin
             Two = new GamePresetPoint();
             Three = new GamePresetPoint();
             Four = new GamePresetPoint();
-            ActiveMarkers = new BitField8();
 
             A.X = placementPreset.X.A;
             A.Y = placementPreset.Y.A;
             A.Z = placementPreset.Z.A;
+            A.Active = placementPreset.Active.A;
 
             B.X = placementPreset.X.B;
             B.Y = placementPreset.Y.B;
             B.Z = placementPreset.Z.B;
+            B.Active = placementPreset.Active.B;
 
             C.X = placementPreset.X.C;
             C.Y = placementPreset.Y.C;
             C.Z = placementPreset.Z.C;
+            C.Active = placementPreset.Active.C;
 
             D.X = placementPreset.X.D;
             D.Y = placementPreset.Y.D;
             D.Z = placementPreset.Z.D;
+            D.Active = placementPreset.Active.D;
 
             One.X = placementPreset.X.One;
             One.Y = placementPreset.Y.One;
             One.Z = placementPreset.Z.One;
+            One.Active = placementPreset.Active.One;
 
             Two.X = placementPreset.X.Two;
             Two.Y = placementPreset.Y.Two;
             Two.Z = placementPreset.Z.Two;
+            Two.Active = placementPreset.Active.Two;
 
             Three.X = placementPreset.X.Three;
             Three.Y = placementPreset.Y.Three;
             Three.Z = placementPreset.Z.Three;
+            Three.Active = placementPreset.Active.Three;
 
             Four.X = placementPreset.X.Four;
             Four.Y = placementPreset.Y.Four;
             Four.Z = placementPreset.Z.Four;
-
-            ActiveMarkers[0] = placementPreset.Active.A;
-            ActiveMarkers[1] = placementPreset.Active.B;
-            ActiveMarkers[2] = placementPreset.Active.C;
-            ActiveMarkers[3] = placementPreset.Active.D;
-            ActiveMarkers[4] = placementPreset.Active.One;
-            ActiveMarkers[5] = placementPreset.Active.Two;
-            ActiveMarkers[6] = placementPreset.Active.Three;
-            ActiveMarkers[7] = placementPreset.Active.Four;
+            Four.Active = placementPreset.Active.Four;
 
             _reserved = 0;
             ContentFinderConditionID = 0;
@@ -223,7 +217,6 @@ namespace WaymarkOCDPlugin
                     $"2: {Two}\r\n" +
                     $"3: {Three}\r\n" +
                     $"4: {Four}\r\n" +
-                    $"Active Flags: {ActiveMarkers}\r\n" +
                     $"Reserved: 0x{_reserved:X}\r\n" +
                     $"ContentFinderCondition: {ContentFinderConditionID}\r\n" +
                     $"Timestamp: {UnixTime}";
@@ -291,7 +284,17 @@ namespace WaymarkOCDPlugin
 
         public GamePreset_Placement(GamePreset preset)
         {
-            Active = new GamePreset_Placement_AxisActive(preset.ActiveMarkers);
+            BitField8 ActiveMarkers = new();
+            ActiveMarkers[0] = preset.A.Active;
+            ActiveMarkers[1] = preset.B.Active;
+            ActiveMarkers[2] = preset.C.Active;
+            ActiveMarkers[3] = preset.D.Active;
+            ActiveMarkers[4] = preset.One.Active;
+            ActiveMarkers[5] = preset.Two.Active;
+            ActiveMarkers[6] = preset.Three.Active;
+            ActiveMarkers[7] = preset.Four.Active;
+
+            Active = new GamePreset_Placement_AxisActive(ActiveMarkers);
 
             X = new GamePreset_Placement_AxisCoords();
             Y = new GamePreset_Placement_AxisCoords();

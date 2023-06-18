@@ -45,49 +45,49 @@ namespace WaymarkOCDPlugin
             newPreset.A.X = gamePreset.A.X / 1000.0f;
             newPreset.A.Y = gamePreset.A.Y / 1000.0f;
             newPreset.A.Z = gamePreset.A.Z / 1000.0f;
-            newPreset.A.Active = gamePreset.ActiveMarkers[0];
+            newPreset.A.Active = gamePreset.A.Active;
             newPreset.A.ID = 0;
 
             newPreset.B.X = gamePreset.B.X / 1000.0f;
             newPreset.B.Y = gamePreset.B.Y / 1000.0f;
             newPreset.B.Z = gamePreset.B.Z / 1000.0f;
-            newPreset.B.Active = gamePreset.ActiveMarkers[1];
+            newPreset.B.Active = gamePreset.B.Active;
             newPreset.B.ID = 1;
 
             newPreset.C.X = gamePreset.C.X / 1000.0f;
             newPreset.C.Y = gamePreset.C.Y / 1000.0f;
             newPreset.C.Z = gamePreset.C.Z / 1000.0f;
-            newPreset.C.Active = gamePreset.ActiveMarkers[2];
+            newPreset.C.Active = gamePreset.C.Active;
             newPreset.C.ID = 2;
 
             newPreset.D.X = gamePreset.D.X / 1000.0f;
             newPreset.D.Y = gamePreset.D.Y / 1000.0f;
             newPreset.D.Z = gamePreset.D.Z / 1000.0f;
-            newPreset.D.Active = gamePreset.ActiveMarkers[3];
+            newPreset.D.Active = gamePreset.D.Active;
             newPreset.D.ID = 3;
 
             newPreset.One.X = gamePreset.One.X / 1000.0f;
             newPreset.One.Y = gamePreset.One.Y / 1000.0f;
             newPreset.One.Z = gamePreset.One.Z / 1000.0f;
-            newPreset.One.Active = gamePreset.ActiveMarkers[4];
+            newPreset.One.Active = gamePreset.One.Active;
             newPreset.One.ID = 4;
 
             newPreset.Two.X = gamePreset.Two.X / 1000.0f;
             newPreset.Two.Y = gamePreset.Two.Y / 1000.0f;
             newPreset.Two.Z = gamePreset.Two.Z / 1000.0f;
-            newPreset.Two.Active = gamePreset.ActiveMarkers[5];
+            newPreset.Two.Active = gamePreset.Two.Active;
             newPreset.Two.ID = 5;
 
             newPreset.Three.X = gamePreset.Three.X / 1000.0f;
             newPreset.Three.Y = gamePreset.Three.Y / 1000.0f;
             newPreset.Three.Z = gamePreset.Three.Z / 1000.0f;
-            newPreset.Three.Active = gamePreset.ActiveMarkers[6];
+            newPreset.Three.Active = gamePreset.Three.Active;
             newPreset.Three.ID = 6;
 
             newPreset.Four.X = gamePreset.Four.X / 1000.0f;
             newPreset.Four.Y = gamePreset.Four.Y / 1000.0f;
             newPreset.Four.Z = gamePreset.Four.Z / 1000.0f;
-            newPreset.Four.Active = gamePreset.ActiveMarkers[7];
+            newPreset.Four.Active = gamePreset.Four.Active;
             newPreset.Four.ID = 7;
 
             newPreset.MapID = gamePreset.ContentFinderConditionID;
@@ -101,42 +101,42 @@ namespace WaymarkOCDPlugin
         {
             GamePreset preset = new();
 
-            preset.ActiveMarkers[0] = A.Active;
+            preset.A.Active = A.Active;
             preset.A.X = A.Active ? (int)(A.X * 1000.0) : 0;
             preset.A.Y = A.Active ? (int)(A.Y * 1000.0) : 0;
             preset.A.Z = A.Active ? (int)(A.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[1] = B.Active;
+            preset.B.Active = B.Active;
             preset.B.X = B.Active ? (int)(B.X * 1000.0) : 0;
             preset.B.Y = B.Active ? (int)(B.Y * 1000.0) : 0;
             preset.B.Z = B.Active ? (int)(B.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[2] = C.Active;
+            preset.C.Active = C.Active;
             preset.C.X = C.Active ? (int)(C.X * 1000.0) : 0;
             preset.C.Y = C.Active ? (int)(C.Y * 1000.0) : 0;
             preset.C.Z = C.Active ? (int)(C.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[3] = D.Active;
+            preset.D.Active = D.Active;
             preset.D.X = D.Active ? (int)(D.X * 1000.0) : 0;
             preset.D.Y = D.Active ? (int)(D.Y * 1000.0) : 0;
             preset.D.Z = D.Active ? (int)(D.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[4] = One.Active;
+            preset.One.Active = One.Active;
             preset.One.X = One.Active ? (int)(One.X * 1000.0) : 0;
             preset.One.Y = One.Active ? (int)(One.Y * 1000.0) : 0;
             preset.One.Z = One.Active ? (int)(One.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[5] = Two.Active;
+            preset.Two.Active = Two.Active;
             preset.Two.X = Two.Active ? (int)(Two.X * 1000.0) : 0;
             preset.Two.Y = Two.Active ? (int)(Two.Y * 1000.0) : 0;
             preset.Two.Z = Two.Active ? (int)(Two.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[6] = Three.Active;
+            preset.Three.Active = Three.Active;
             preset.Three.X = Three.Active ? (int)(Three.X * 1000.0) : 0;
             preset.Three.Y = Three.Active ? (int)(Three.Y * 1000.0) : 0;
             preset.Three.Z = Three.Active ? (int)(Three.Z * 1000.0) : 0;
 
-            preset.ActiveMarkers[7] = Four.Active;
+            preset.Four.Active = Four.Active;
             preset.Four.X = Four.Active ? (int)(Four.X * 1000.0) : 0;
             preset.Four.Y = Four.Active ? (int)(Four.Y * 1000.0) : 0;
             preset.Four.Z = Four.Active ? (int)(Four.Z * 1000.0) : 0;
