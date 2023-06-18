@@ -2,12 +2,8 @@
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.ClientState.Party;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
-using Dalamud.Game.Network;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System;
@@ -21,14 +17,8 @@ namespace WaymarkOCDPlugin
         [PluginService][RequiredVersion("1.0")] public static CommandManager commandManager { get; private set; } = null!;
         [PluginService][RequiredVersion("1.0")] public static ChatGui chatGui { get; private set; } = null!;
         [PluginService][RequiredVersion("1.0")] public static ClientState clientState { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static JobGauges jobGauges { get; private set; } = null!;
         [PluginService][RequiredVersion("1.0")] public static Condition condition { get; private set; } = null!;
         [PluginService][RequiredVersion("1.0")] public static SigScanner sigScanner { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static PartyList partyList { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static TargetManager targetManager { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static ObjectTable objectTable { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static DalamudPluginInterface pluginInterface { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static GameNetwork gameNetwork { get; private set; } = null!;
         [PluginService][RequiredVersion("1.0")] public static DataManager dataManager { get; private set; } = null!;
 
         public WaymarkOCD()
@@ -84,13 +74,11 @@ namespace WaymarkOCDPlugin
             }
 
             GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
-
             if (preset == null)
             {
                 chatGui.Print("No waymarks detected");
                 return;
             }
-
             GamePreset realPreset = preset.Value;
 
             switch (marker)
@@ -172,9 +160,9 @@ namespace WaymarkOCDPlugin
         private unsafe void OnSetWaymarkCommandPolar(string command, string args)
         {
             string[] arguments = args.Split(" ");
-            if (arguments.Length != 3)
+            if (arguments.Length != 3 && arguments.Length != 4)
             {
-                chatGui.Print("Usage: /setwaymark a degrees distance");
+                chatGui.Print("Usage: /setwaymarkpolar a degrees distance");
                 chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
                 return;
             }
@@ -195,17 +183,29 @@ namespace WaymarkOCDPlugin
                 return;
             }
 
-            var (x, y) = PolarCoordinatesHelper.GetXYCoordinatesFromPolar(distance, degrees);
+            int offset = 0;
+
+            if (arguments.Length == 4)
+            {
+                string offsetString = arguments[3];
+                if (!int.TryParse(offsetString, out offset))
+                {
+                    chatGui.Print("offset was not a number: " + offset);
+                    return;
+                }
+            }
 
             GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
-
             if (preset == null)
             {
                 chatGui.Print("No waymarks detected");
                 return;
             }
-
             GamePreset realPreset = preset.Value;
+
+            var (x, y) = PolarCoordinatesHelper.GetXYCoordinatesFromPolar(distance, degrees);
+            x += offset;
+            y += offset;
 
             switch (marker)
             {
