@@ -52,23 +52,4 @@ This will yield perfectly circular markers, distanced 10,000 units from the cent
 ![CircularWaymarks](Circular_Waymarks.png)
 
 
-WARNING: By default, `/setwaymarkpolar` assumes that 0,0 is the center of the arena. But this is not true for every instance. Partway through Stormblood, they began using 100000,100000 as the center of the arenas. 
-
-I am investigating a way to automatically detect if the player is in a 0,0 arena or a 100000,100000 arena. In the meantime, for 100k arenas you can pass in an offset of 100k:
-```
-/setwaymarkpolar A 0 10000 100000
-/wait 1
-/setwaymarkpolar 1 45 10000 100000
-/wait 1
-/setwaymarkpolar B 90 10000 100000
-/wait 1
-/setwaymarkpolar 2 135 10000 100000
-/wait 1
-/setwaymarkpolar C 180 10000 100000
-/wait 1
-/setwaymarkpolar 3 225 10000 100000
-/wait 1
-/setwaymarkpolar D 270 10000 100000
-/wait 1
-/setwaymarkpolar 4 315 10000 100000
-```
+WARNING: You may need to place a waymark manually before using the /setwaymarkpolar command. 

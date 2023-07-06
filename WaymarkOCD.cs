@@ -26,9 +26,31 @@ namespace WaymarkOCDPlugin
             MemoryHandler.Init();
             ZoneInfoHandler.Init();
 
-            commandManager.AddHandler("/setwaymark", new(OnSetWaymarkCommand));
-            commandManager.AddHandler("/getwaymark", new(OnGetWaymarkCommand));
-            commandManager.AddHandler("/setwaymarkpolar", new(OnSetWaymarkCommandPolar));
+            commandManager.AddHandler("/setwaymark", new(OnSetWaymarkCommand)
+            {
+                HelpMessage = "Sets a waymark's coordinates.\n"
+                                + "/setwaymark a 0 10000\n"
+                                + "/setwaymark 1 10000 10000\n ",
+
+                ShowInHelp = true
+            });
+            commandManager.AddHandler("/getwaymark", new(OnGetWaymarkCommand)
+            {
+                HelpMessage = "Gets a waymark's coordinates.\n"
+                                + "/getwaymark a\n"
+                                + "/getwaymark 1\n ",
+
+                ShowInHelp = true
+            });
+            commandManager.AddHandler("/setwaymarkpolar", new(OnSetWaymarkCommandPolar)
+            {
+                HelpMessage = "Sets a waymark's coordinates using a polar coordinate system.\n"
+                                + "/setwaymarkpolar a 0 10000\n"
+                                + "/setwaymarkpolar a 45 10000\n"
+                                + "NOTE: You may need to place a waymark manually before using the /setwaymarkpolar command.\n ",
+
+                ShowInHelp = true
+            });
         }
 
         private static GamePresetPoint? GetMarker(GamePreset gamePreset, String marker)
@@ -160,7 +182,7 @@ namespace WaymarkOCDPlugin
         private unsafe void OnSetWaymarkCommandPolar(string command, string args)
         {
             string[] arguments = args.Split(" ");
-            if (arguments.Length != 3 && arguments.Length != 4)
+            if (arguments.Length != 3)
             {
                 chatGui.Print("Usage: /setwaymarkpolar a degrees distance");
                 chatGui.Print("Valid waymark names: a, b, c, d, 1, 2, 3, 4");
@@ -183,18 +205,6 @@ namespace WaymarkOCDPlugin
                 return;
             }
 
-            int offset = 0;
-
-            if (arguments.Length == 4)
-            {
-                string offsetString = arguments[3];
-                if (!int.TryParse(offsetString, out offset))
-                {
-                    chatGui.Print("offset was not a number: " + offset);
-                    return;
-                }
-            }
-
             GamePreset? preset = MemoryHandler.GetCurrentWaymarksAsPresetData();
             if (preset == null)
             {
@@ -204,8 +214,12 @@ namespace WaymarkOCDPlugin
             GamePreset realPreset = preset.Value;
 
             var (x, y) = PolarCoordinatesHelper.GetXYCoordinatesFromPolar(distance, degrees);
-            x += offset;
-            y += offset;
+
+            if (Is100kArena(realPreset))
+            {
+                x += 100000;
+                y += 100000;
+            }
 
             switch (marker)
             {
@@ -260,6 +274,26 @@ namespace WaymarkOCDPlugin
             }
 
             MemoryHandler.DirectPlacePreset(realPreset);
+        }
+
+        // Pre-Stormblood, every arena was centered on 0,0. But halfway through Stormblood, they started using 100000,100000 as the center of the arena. 
+        // This function checks to see if we are in a 100k,100k arena or not
+        // We can only determine this by checking existing waymarks (the player coordinate system is completely different than the waymark coordinate system)
+        private static bool Is100kArena(GamePreset preset)
+        {
+            return IsWaymarkFromA100kArena(preset.A)
+                || IsWaymarkFromA100kArena(preset.B)
+                || IsWaymarkFromA100kArena(preset.C)
+                || IsWaymarkFromA100kArena(preset.D)
+                || IsWaymarkFromA100kArena(preset.One)
+                || IsWaymarkFromA100kArena(preset.Two)
+                || IsWaymarkFromA100kArena(preset.Three)
+                || IsWaymarkFromA100kArena(preset.Four);
+        }
+
+        private static bool IsWaymarkFromA100kArena(GamePresetPoint waymark)
+        {
+            return waymark.X > 80000 || waymark.Z > 80000;
         }
 
         //	Cleanup
