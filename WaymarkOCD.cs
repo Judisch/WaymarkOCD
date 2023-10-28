@@ -1,11 +1,7 @@
-﻿using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
+﻿using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using System;
 
 namespace WaymarkOCDPlugin
@@ -14,12 +10,12 @@ namespace WaymarkOCDPlugin
     {
         public string Name => "Waymark OCD Plugin";
 
-        [PluginService][RequiredVersion("1.0")] public static CommandManager commandManager { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static ChatGui chatGui { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static ClientState clientState { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static Condition condition { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static SigScanner sigScanner { get; private set; } = null!;
-        [PluginService][RequiredVersion("1.0")] public static DataManager dataManager { get; private set; } = null!;
+        [PluginService][RequiredVersion("1.0")] public static ICommandManager commandManager { get; private set; } = null!;
+        [PluginService][RequiredVersion("1.0")] public static IChatGui chatGui { get; private set; } = null!;
+        [PluginService][RequiredVersion("1.0")] public static IClientState clientState { get; private set; } = null!;
+        [PluginService][RequiredVersion("1.0")] public static ICondition condition { get; private set; } = null!;
+        [PluginService][RequiredVersion("1.0")] public static ISigScanner sigScanner { get; private set; } = null!;
+        [PluginService][RequiredVersion("1.0")] public static IDataManager dataManager { get; private set; } = null!;
 
         public WaymarkOCD()
         {
